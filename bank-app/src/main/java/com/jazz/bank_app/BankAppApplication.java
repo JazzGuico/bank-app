@@ -13,9 +13,13 @@ public class BankAppApplication {
 	}
 
 	@Bean
-	public CommandLineRunner testRunner(SomeService someService) {
+	public CommandLineRunner testRunner(AccountService accountService) {
 		return args -> {
-			System.out.println("Spring gave us: " + someService);
+			BankAccount jazzAccount = accountService.openAccount("Jazz");
+			jazzAccount.deposit(500);
+
+			BankAccount retrieved = accountService.getAccount("Jazz");
+			System.out.println(retrieved.generateStatement());
 		};
 	}
 }
