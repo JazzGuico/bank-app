@@ -17,15 +17,33 @@ public class AccountService {
         this.notificationService = notificationService;
     }
 
-    // Method to open a new bank account
-    public BankAccount openAccount(String accountHolder) {
+    // Method to open a new bank account (to create a new account). Returns true if the account is successfully created, false if the account already exists.
+    public boolean openAccount(String accountHolder) {
+        if (accounts.containsKey(accountHolder)) {
+            return false; // Account already exists
+        }
         BankAccount account = new BankAccount(accountHolder, notificationService);
         accounts.put(accountHolder, account);
-        return account;
+        return true;
     }
 
-    // Getter Method to retrieve an existing bank account by account holder's name
+    // Getter Method to retrieve an existing bank account by account holder's name. to read the account details. Returns the BankAccount object if found, null if the account does not exist.
     public BankAccount getAccount(String accountHolder) {
-        return accounts.get(accountHolder);
+        BankAccount account = accounts.get(accountHolder);
+        if (account != null) {
+            return account;
+        } else {
+            throw new IllegalArgumentException("Account not found for holder: " + accountHolder);
+        }
+    }
+
+    public boolean deposit(String accountHolder, double amount) {
+        BankAccount account = getAccount(accountHolder);
+        return account.deposit(amount);
+    }
+
+    public boolean withdraw(String accountHolder, double amount) {
+        BankAccount account = getAccount(accountHolder);
+        return account.withdraw(amount);
     }
 }
