@@ -15,37 +15,28 @@ public class AccountController {
         this.accountService = accountService;
     }
 
-    // Endpoint to retrieve an existing bank account by account holder's name
+    // Endpoint to retrieve an existing bank account by account holder's name (read)
     @GetMapping("/{accountHolder}")
     public BankAccount getAccount(@PathVariable String accountHolder) {
         return accountService.getAccount(accountHolder);
     }
 
-    // Endpoint to open a new bank account
+    // Endpoint to open a new bank account (create)
     @PostMapping("/{accountHolder}")
-    public BankAccount openAccount(@PathVariable String accountHolder) {
-        return accountService.openAccount(accountHolder); 
+    public boolean openAccount(@PathVariable String accountHolder) {
+        return accountService.openAccount(accountHolder);
     }
 
-    // Endpoint to deposit money into an account
+    // Endpoint to deposit money into an account (update)
     @PutMapping("/{accountHolder}/deposit")
     public boolean deposit(@PathVariable String accountHolder, @RequestParam double amount) {
-    BankAccount account = accountService.getAccount(accountHolder);
-    if (account != null) {
-        return account.deposit(amount);
-    } else {
-        throw new IllegalArgumentException("Account not found for holder: " + accountHolder);
+        return accountService.deposit(accountHolder, amount);
     }
-}
+    
 
-    // Endpoint to withdraw money from an account
+    // Endpoint to withdraw money from an account (update)
     @PutMapping("/{accountHolder}/withdraw")
     public boolean withdraw(@PathVariable String accountHolder, @RequestParam double amount) {
-        BankAccount account = accountService.getAccount(accountHolder);
-        if (account != null) {
-            return account.withdraw(amount);
-        } else {
-            throw new IllegalArgumentException("Account not found for holder: " + accountHolder);
-        }
+        return accountService.withdraw(accountHolder, amount);
     }
 }
