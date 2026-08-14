@@ -26,6 +26,7 @@ public class BankAccount {
     // deposit method to add money to the account. returns true if deposit is successful, false otherwise
     public boolean deposit(double amount) {
         if (amount <= 0) { //ensures that every deposit amount is a positive number
+            this.notificationService.sendNotification(this.accountHolder, "Deposit of " + amount + " failed. Amount must be positive.");
             return false;
         } else {
             this.balance += amount;
@@ -37,8 +38,10 @@ public class BankAccount {
     // withdraw method to remove money from the account. returns true if withdrawal is successful, false otherwise
     public boolean withdraw(double amount) {
     if (amount <= 0 ) { //ensures that every withdrawal amount is a positive number
+        this.notificationService.sendNotification(this.accountHolder, "Withdrawal of " + amount + " failed. Amount must be positive.");
         return false; // withdrawal denied
     } else if (amount > this.balance){ // ensures that the withdrawal amount does not exceed the current balance
+        this.notificationService.sendNotification(this.accountHolder, "Withdrawal of " + amount + " failed. Insufficient funds. Current balance: " + this.balance);
         return false;
     }
     this.balance -= amount;
