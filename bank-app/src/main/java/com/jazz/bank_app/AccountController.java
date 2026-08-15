@@ -39,4 +39,11 @@ public class AccountController {
     public boolean withdraw(@PathVariable String accountHolder, @RequestParam double amount) {
         return accountService.withdraw(accountHolder, amount);
     }
+
+    // Endpoint to deserialize JSON data and to create an account using the deserialized data (create)
+    @PostMapping
+    public boolean createAccount(@RequestBody AccountDto accountDto) {
+        return accountService.createAccount(accountDto);
+    }
 }
+    
