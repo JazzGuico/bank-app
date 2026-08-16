@@ -17,8 +17,9 @@ public class AccountController {
 
     // Endpoint to retrieve an existing bank account by account holder's name (read)
     @GetMapping("/{accountHolder}")
-    public BankAccount getAccount(@PathVariable String accountHolder) {
-        return accountService.getAccount(accountHolder);
+    public AccountResponse getAccount(@PathVariable String accountHolder) {
+        BankAccount account = accountService.getAccount(accountHolder);
+        return new AccountResponse(account.getAccountHolder(), account.getBalance());
     }
 
     // Endpoint to open a new bank account (create)
