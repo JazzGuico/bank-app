@@ -10,21 +10,24 @@ import java.util.Map;
 public class AccountService {
     private NotificationService notificationService;
     private Map<String, BankAccount> accounts = new HashMap<>();
+    private BankAccountRepository bankAccountRepository;
 
     // Constructor to inject the NotificationService dependency
     @Autowired
-    public AccountService(@Qualifier("emailNotificationService") NotificationService notificationService) { 
+    public AccountService(@Qualifier("emailNotificationService") NotificationService notificationService, BankAccountRepository bankAccountRepository) { 
         this.notificationService = notificationService;
+        this.bankAccountRepository = bankAccountRepository;
     }
 
     // Method to open a new bank account. Returns true if the account is successfully created, false if the account already exists.
     public boolean openAccount(String accountHolder) {
-        if (accounts.containsKey(accountHolder)) {
+        if (bankAccountRepository.existsByAccountHolder(accountHolder)) {
             return false; // Account already exists
         }
         BankAccount account = new BankAccount(accountHolder, notificationService);
+        account = bankAccountRepository.save(account);
         accounts.put(accountHolder, account);
-        return true; // Account successfully created
+        return true; // Account successfully created 
     }
 
     // Getter Method to retrieve an existing bank account by account holder's name. to read the account details. Returns the BankAccount object if found, null if the account does not exist.
