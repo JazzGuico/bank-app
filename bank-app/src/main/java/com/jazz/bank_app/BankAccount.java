@@ -2,27 +2,39 @@ package com.jazz.bank_app;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Transient;
 
+@Entity
 public class BankAccount {
     // my  instance variable (located in heap memory. usable only by the methods in this class)
     private String accountHolder;
     protected double balance;
+    @Transient
     private NotificationService notificationService; // new field
+    @Id
+    private int userId;
 
     // my constructor 
-    public BankAccount(String accountHolder, NotificationService notificationService) {
+    protected BankAccount(String accountHolder, int userId, NotificationService notificationService) {
         if (accountHolder == null || accountHolder.trim().isEmpty()) {
         throw new IllegalArgumentException("Account holder name cannot be null or empty.");
         }
         if (notificationService == null) {
             throw new IllegalArgumentException("Notification service cannot be null.");
         }
+        this.userId = userId;
         this.accountHolder = accountHolder;
         this.balance = 0;
         this.notificationService = notificationService; // stored once, used everywhere
     }
 
-    // my methods:
+    protected BankAccount() {
+        
+    }
+
+    // MY METHODS:
     // deposit method to add money to the account. returns true if deposit is successful, false otherwise
     public boolean deposit(double amount) {
         if (amount <= 0) { //ensures that every deposit amount is a positive number
@@ -57,6 +69,11 @@ public class BankAccount {
     // method to return the values from methods (balance)
     public double getBalance() {
         return this.balance;
+    }
+
+    // method to return userId
+    public int getUserId() {
+        return this.userId;
     }
 
     // method to return the values from methods (accountHolder)
