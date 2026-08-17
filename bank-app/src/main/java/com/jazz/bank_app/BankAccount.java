@@ -2,7 +2,10 @@ package com.jazz.bank_app;
 
 import java.io.FileWriter;
 import java.io.IOException;
+
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Transient;
 
@@ -14,17 +17,17 @@ public class BankAccount {
     @Transient
     private NotificationService notificationService; // new field
     @Id
-    private int userId;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer userId;
 
     // my constructor 
-    protected BankAccount(String accountHolder, int userId, NotificationService notificationService) {
+    protected BankAccount(String accountHolder, NotificationService notificationService) {
         if (accountHolder == null || accountHolder.trim().isEmpty()) {
         throw new IllegalArgumentException("Account holder name cannot be null or empty.");
         }
         if (notificationService == null) {
             throw new IllegalArgumentException("Notification service cannot be null.");
         }
-        this.userId = userId;
         this.accountHolder = accountHolder;
         this.balance = 0;
         this.notificationService = notificationService; // stored once, used everywhere
@@ -72,7 +75,7 @@ public class BankAccount {
     }
 
     // method to return userId
-    public int getUserId() {
+    public Integer getUserId() {
         return this.userId;
     }
 
