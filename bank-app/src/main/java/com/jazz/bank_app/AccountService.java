@@ -3,13 +3,11 @@ package com.jazz.bank_app;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Optional;
 
 @Service
 public class AccountService {
     private NotificationService notificationService;
-    private Map<String, BankAccount> accounts = new HashMap<>();
     private BankAccountRepository bankAccountRepository;
 
     // Constructor to inject the NotificationService dependency
@@ -26,15 +24,14 @@ public class AccountService {
         }
         BankAccount account = new BankAccount(accountHolder, notificationService);
         account = bankAccountRepository.save(account);
-        accounts.put(accountHolder, account);
         return true; // Account successfully created 
     }
 
     // Getter Method to retrieve an existing bank account by account holder's name. to read the account details. Returns the BankAccount object if found, null if the account does not exist.
     public BankAccount getAccount(String accountHolder) {
-        BankAccount account = accounts.get(accountHolder);
-        if (account != null) {
-            return account;
+        Optional<BankAccount> account = bankAccountRepository.findByAccountHolder(accountHolder);
+        if (account.isPresent()) {
+            return account.get();
         } else {
             throw new IllegalArgumentException("Account not found for holder: " + accountHolder);
         }
