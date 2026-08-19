@@ -23,7 +23,7 @@ public class AccountService {
             return false; // Account already exists
         }
         BankAccount account = new BankAccount(accountHolder, notificationService);
-        account = bankAccountRepository.save(account);
+        bankAccountRepository.save(account);
         return true; // Account successfully created 
     }
 
@@ -40,13 +40,17 @@ public class AccountService {
     // Method to deposit money into an account (to update the account balance). Returns true if the deposit is successful, false otherwise.
     public boolean deposit(String accountHolder, double amount) {
         BankAccount account = getAccount(accountHolder);
-        return account.deposit(amount);
+        boolean success = account.deposit(amount);
+        bankAccountRepository.save(account);
+        return success;
     }
 
     // Method to withdraw money from an account (to update the account balance). Returns true if the withdrawal is successful, false otherwise.
     public boolean withdraw(String accountHolder, double amount) {
         BankAccount account = getAccount(accountHolder);
-        return account.withdraw(amount);
+        boolean success = account.withdraw(amount);
+        bankAccountRepository.save(account);
+        return success;
     }
 
     // Method to create an account with initial deposit from AccountDto
