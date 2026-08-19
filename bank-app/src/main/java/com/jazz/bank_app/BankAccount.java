@@ -7,30 +7,23 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.Transient;
 
 @Entity
 public class BankAccount {
     // my  instance variable (located in heap memory. usable only by the methods in this class)
     private String accountHolder;
     protected double balance;
-    @Transient
-    private NotificationService notificationService; // new field
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer userId;
 
     // my constructor 
-    protected BankAccount(String accountHolder, NotificationService notificationService) {
+    protected BankAccount(String accountHolder) {
         if (accountHolder == null || accountHolder.trim().isEmpty()) {
         throw new IllegalArgumentException("Account holder name cannot be null or empty.");
         }
-        if (notificationService == null) {
-            throw new IllegalArgumentException("Notification service cannot be null.");
-        }
         this.accountHolder = accountHolder;
         this.balance = 0;
-        this.notificationService = notificationService; // stored once, used everywhere
     }
 
     protected BankAccount() {
@@ -39,29 +32,35 @@ public class BankAccount {
 
     // MY METHODS:
     // deposit method to add money to the account. returns true if deposit is successful, false otherwise
-    public boolean deposit(double amount) {
+    public DepositResult deposit(double amount) {
         if (amount <= 0) { //ensures that every deposit amount is a positive number
-            this.notificationService.sendNotification(this.accountHolder, "Deposit of " + amount + " failed. Amount must be positive.");
-            return false;
+            return DepositResult.INVALID_AMOUNT;
         } else {
             this.balance += amount;
-            this.notificationService.sendNotification(this.accountHolder, "Deposit of " + amount + " successful. New balance: " + this.balance);
-            return true;
+            return DepositResult.SUCCESS;
         }
     }
 
     // withdraw method to remove money from the account. returns true if withdrawal is successful, false otherwise
-    public boolean withdraw(double amount) {
+    public WithdrawResult withdraw(double amount) {
     if (amount <= 0 ) { //ensures that every withdrawal amount is a positive number
-        this.notificationService.sendNotification(this.accountHolder, "Withdrawal of " + amount + " failed. Amount must be positive.");
-        return false; // withdrawal denied
+        return WithdrawResult.INVALID_AMOUNT; // withdrawal denied
     } else if (amount > this.balance){ // ensures that the withdrawal amount does not exceed the current balance
-        this.notificationService.sendNotification(this.accountHolder, "Withdrawal of " + amount + " failed. Insufficient funds. Current balance: " + this.balance);
-        return false;
+        return WithdrawResult.INSUFFICIENT_FUNDS;
     }
     this.balance -= amount;
-    this.notificationService.sendNotification(this.accountHolder, "Withdrawal of " + amount + " successful. New balance: " + this.balance);
-    return true; // withdrawal succeeded. amount is deducted from balance
+    return WithdrawResult.SUCCESS; // withdrawal succeeded. amount is deducted from balance
+    }
+
+    public enum DepositResult {
+        SUCCESS,
+        INVALID_AMOUNT
+    }
+
+    public enum WithdrawResult {
+        SUCCESS, 
+        INVALID_AMOUNT,
+        INSUFFICIENT_FUNDS
     }
 
     // method to generate a statement for the account
