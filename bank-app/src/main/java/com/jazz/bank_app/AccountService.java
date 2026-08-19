@@ -3,6 +3,7 @@ package com.jazz.bank_app;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+
 import java.util.Optional;
 
 @Service
@@ -22,7 +23,7 @@ public class AccountService {
         if (bankAccountRepository.existsByAccountHolder(accountHolder)) {
             return false; // Account already exists
         }
-        BankAccount account = new BankAccount(accountHolder, notificationService);
+        BankAccount account = new BankAccount(accountHolder);
         bankAccountRepository.save(account);
         return true; // Account successfully created 
     }
@@ -40,17 +41,32 @@ public class AccountService {
     // Method to deposit money into an account (to update the account balance). Returns true if the deposit is successful, false otherwise.
     public boolean deposit(String accountHolder, double amount) {
         BankAccount account = getAccount(accountHolder);
-        boolean success = account.deposit(amount);
+        BankAccount.DepositResult success = account.deposit(amount);
+        if (success == BankAccount.DepositResult.INVALID_AMOUNT) {
+            this.notificationService.sendNotification(accountHolder, "Deposit of " + amount + " failed. Amount must be positive.");
+            return false;
+        } else {
+            this.notificationService.sendNotification(accountHolder, "Deposit of " + amount + " successful. New balance: " + account.getBalance());
+        }
         bankAccountRepository.save(account);
-        return success;
+        return true;
     }
 
     // Method to withdraw money from an account (to update the account balance). Returns true if the withdrawal is successful, false otherwise.
     public boolean withdraw(String accountHolder, double amount) {
         BankAccount account = getAccount(accountHolder);
-        boolean success = account.withdraw(amount);
+        BankAccount.WithdrawResult success = account.withdraw(amount);
+        if (success == BankAccount.WithdrawResult.INVALID_AMOUNT) {
+            this.notificationService.sendNotification(accountHolder, "Withdrawal of " + amount + " failed. Amount must be positive.");
+            return false;
+        } else if (success == BankAccount.WithdrawResult.INSUFFICIENT_FUNDS) {
+            this.notificationService.sendNotification(accountHolder, "Withdrawal of " + amount + " failed. Insufficient funds. Current balance: " + account.getBalance());
+            return false;
+        } else {
+            this.notificationService.sendNotification(accountHolder, "Withdrawal of " + amount + " successful. New balance: " + account.getBalance());
+        }
         bankAccountRepository.save(account);
-        return success;
+        return true;
     }
 
     // Method to create an account with initial deposit from AccountDto
